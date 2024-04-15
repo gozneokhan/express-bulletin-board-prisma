@@ -6,11 +6,12 @@
     "type": "module",
     "scripts": {
         "start": "node app.js",
-        "dev": "nodemon app.js",
+        "dev": "nodemon src/app.js",
         "which": "which nodemon"
     },
     "dependencies": {
         "@prisma/client": "^5.11.0",
+        "bcrypt": "^5.1.1",
         "cookie-parser": "^1.4.6",
         "express": "^4.19.2",
         "jsonwebtoken": "^9.0.2",

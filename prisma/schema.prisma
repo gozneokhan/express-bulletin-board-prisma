@@ -29,7 +29,7 @@ model Users {
 }
 
 model UserInfos { 
-  userInfoId   Int     @id @default(autoincrement()) @map("userInfoId")
+  userInfoId   Int     @id  @default(autoincrement()) @map("userInfoId")
   UserId       Int     @unique @map("UserId")
   name         String  @map("name")
   age          Int?    @map("age")
