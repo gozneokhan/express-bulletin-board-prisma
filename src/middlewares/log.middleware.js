@@ -13,7 +13,6 @@ const logger = winston.createLogger({
 export default function (req, res, next) {
     // (2) 시작시간 정의
     const start = new Date().getTime(); // 해당하는 log가 언제 시작됐는지 확인하기 위해 시간 정보 적용 -> 현재 시간 가져오기
-
     // res.on() 문법을 통해 해당하는 응답이 완료되었을 때, 로그를 출력하는 과정을 거쳐감
     // (4) 마지막으로 callback 함수 '()=> {}' 실행
     res.on('finish', () => {

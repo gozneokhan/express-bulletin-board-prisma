@@ -17,6 +17,7 @@ export default async function (req, res, next) {
 
         // 실저로 jwt가 서버에서 발급한 게 맞는지 검증이 완료되었을 때만 decodedToken에 할당
         const decodedToken = jwt.verify(token, 'custom-secret-key');
+
         // jwt의 userId를 이용해 사용자를 조회
         // jwt 내부에다가 userId를 하나 저장 -> 사용자 middleware에서도 userId를 꺼내서 사용 가능
         const userId = decodedToken.userId;
