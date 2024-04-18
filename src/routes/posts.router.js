@@ -3,7 +3,6 @@ import { prisma } from '../utils/prisma/index.js';
 import authMiddleware from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
-
 /**
  * 1. 게시글을 작성하려는 클라이언트가 로그인된 사용자인지 검증 -> 사용자 인증 미들웨어를 통해 수행
  * 2. 게시글 생성을 위한 title, content를 body로 전달 받음
