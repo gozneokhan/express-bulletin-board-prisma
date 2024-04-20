@@ -9,7 +9,7 @@ Sequential Transaction과 Interactive Transaction.
 2. Interactive Transaction:
    Prisma 자체적으로 트랜잭션의 성공과 실패를 관리하며 이 유형의 트랜잭션에서는 개발자가 직접적으로 트랜잭션을 컨트롤하고 관리할 수 있음
 
-## Sequential Transaction
+# Sequential Transaction
 
 Sequential Transaction은 Prisma의 여러 Query를 Array([])로 전달받아, 각 쿼리들을 순서대로 실행하는 특징이 있습니다. 이러한 특징은 여러 작업이 순차적으로 실행되어야할 때 사용할 수 있음
 
@@ -26,7 +26,7 @@ const [posts, comments] = await prisma.$transaction([
 ])
 ```
 
--   위에 있는 코드를 살펴보면 prisma.$transaction([]) 방식을 통해서 Transaction의 Method를 사용할 수 있는걸 확인 가능
+  위에 있는 코드를 살펴보면 prisma.$transaction([]) 방식을 통해서 Transaction의 Method를 사용할 수 있는걸 확인 가능
     그런데 여기서 Transaction을 실행을 할 때 []이런 Array 형태로 전달을 받게 된다면 Array 내에 있는 Prisma의 Query들을 순차적으로 실행하도록 도와주는게 Sequential Transaction임
 
 그래서 현재 Array 안에 있는 Query들이 Posts 테이블에서 여러가지의 데이터들을 조회하고 그 다음에 댓글 테이블에서 여러가지 데이터를 조회한 결과값을 왼쪽 앞에 있는 const [posts, comments]에 각각 배열 형태로 하나하나씩 할당됨
