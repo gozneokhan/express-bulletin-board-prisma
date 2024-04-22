@@ -1,7 +1,7 @@
 import express from 'express';
 import { prisma } from '../utils/prisma/index.js';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+// import jwt from 'jsonwebtoken';
 import authMiddleware from '../middlewares/auth.middleware.js';
 import { Prisma } from '@prisma/client';
 
@@ -47,7 +47,7 @@ router.post('/sign-up', async (req, res, next) => {
                     },
                 });
 
-                throw new Error('고의로 발생시킨 Transaction Error'); // ROLLBACK
+                // throw new Error('고의로 발생시킨 Transaction Error'); // ROLLBACK
 
                 // 사용자 정보 저장
                 const userInfo = await tx.userInfos.create({
@@ -99,12 +99,16 @@ router.post('/sign-in', async (req, res, next) => {
     if (!(await bcrypt.compare(password, user.password)))
         return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
 
+    // express-session 사용
+    req.session.userId = user.userId;
+
+    // jwt 사용
     // jwt 할당 -> token을 통해 jsonwebtoken을 실제로 만들어서 저장 -> jwt.sign을 통해 사용자의 정보를 실제로 만듬
     // userId라는 정보를 실제 사용자가 가지고 있는 user에 있는 userId 값을 할당해서 jwt를 생성 -> 생성할 때 사용하는 jwt의 시크릿 키는 'custom-secret-key'
-    const token = jwt.sign({ userId: user.userId }, 'custom-secret-key');
+    // const token = jwt.sign({ userId: user.userId }, 'custom-secret-key');
 
     // res를 이용해서 Client에게 cookie 할당
-    res.cookie('authorization', `Bearer ${token}`); // %20 -> space
+    // res.cookie('authorization', `Bearer ${token}`); // %20 -> space
     return res.status(200).json({ message: '로그인에 성공하였습니다.' });
 });
 
