@@ -4,6 +4,8 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+// schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,63 +16,77 @@ datasource db {
 }
 
 model Users {
-  userId   Int     @id @default(autoincrement()) @map("userId")
-  email    String  @unique @map("email")
-  password String  @map("password")
-
+  userId    Int      @id @default(autoincrement()) @map("userId")
+  email     String   @unique @map("email")
+  password  String   @map("password")
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
 
-  UserInfos UserInfos? // 1명의 사용자는 1개의 정보를 가진다.
-  Posts Posts[] // 1명의 사용자는 여러개의 게시글을 작성할 수 있다.
-  Comments Comments[] // 1명의 사용자는 여러개의 댓글을 작성할 수 있다.
-
+  userInfos UserInfos? // 사용자(Users) 테이블과 사용자 정보(UserInfos) 테이블이 1:1 관계를 맺습니다.
+  posts     Posts[] // 사용자(Users) 테이블과 게시글(Posts) 테이블이 1:N 관계를 맺습니다.
+  comments  Comments[] // 사용자(Users) 테이블과 댓글(Comments) 테이블이 1:N 관계를 맺습니다.
+  userHistories UserHistories[] // 사용자(Users) 테이블과 사용자 히스토리(UserHistories) 테이블이 1:N 관계를 맺습니다.
+  
   @@map("Users")
 }
 
-model UserInfos { 
-  userInfoId   Int     @id @default(autoincrement()) @map("userInfoId")
-  UserId       Int     @unique @map("UserId")
-  name         String  @map("name")
-  age          Int?    @map("age")
-  gender       String  @map("gender")
-  profileImage String? @map("profileImage")
-
-  createdAt DateTime @default(now()) @map("createdAt")
-  updatedAt DateTime @updatedAt @map("updatedAt")
-
-  User Users @relation(fields: [UserId], references: [userId], onDelete: Cascade)
-
-  @@map("UserInfos")
-}
-
 model Posts {
-  postId  Int     @id @default(autoincrement()) @map("postId")
-  UserId  Int     @map("UserId")
-  title   String  @map("title")
-  content String  @db.Text @map("content") 
-
+  postId    Int      @id @default(autoincrement()) @map("postId")
+  userId    Int      @map("userId") // 사용자(Users) 테이블을 참조하는 외래키
+  title     String   @map("title")
+  content   String   @map("content") @db.Text
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
 
-  Comments Comments[] // 1개의 게시글에서 여러개의 댓글을 작성할 수 있다.
-
-  User Users @relation(fields: [UserId], references: [userId], onDelete:Cascade)
+  // Users 테이블과 관계를 설정합니다.
+  user     Users      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  comments Comments[] // 게시글(Posts) 테이블과 댓글(Comments) 테이블이 1:N 관계를 맺습니다.
 
   @@map("Posts")
 }
 
-model Comments {
-  commentId Int     @id @default(autoincrement()) @map("commentId")
-  UserId    Int     @map("UserId")
-  PostId    Int     @map("PostId")
-  content   String  @map("content")
+model UserInfos {
+  userInfoId   Int      @id @default(autoincrement()) @map("userInfoId")
+  userId       Int      @unique @map("userId") // 사용자(Users) 테이블을 참조하는 외래키
+  name         String   @map("name")
+  age          Int?     @map("age")
+  gender       String   @map("gender")
+  profileImage String?  @map("profileImage")
+  createdAt    DateTime @default(now()) @map("createdAt")
+  updatedAt    DateTime @updatedAt @map("updatedAt")
 
+  // Users 테이블과 관계를 설정합니다.
+  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("UserInfos")
+}
+
+model Comments {
+  commentId Int      @id @default(autoincrement()) @map("commentId")
+  postId    Int      @map("postId") // 게시글(Posts) 테이블을 참조하는 외래키
+  userId    Int      @map("userId") // 사용자(Users) 테이블을 참조하는 외래키
+  content   String   @map("content")
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
 
-  User Users @relation(fields:[UserId], references:[userId], onDelete:Cascade)
-  Post Posts @relation(fields:[PostId], references:[postId], onDelete:Cascade)
+  // Posts 테이블과 관계를 설정합니다.
+  post Posts @relation(fields: [postId], references: [postId], onDelete: Cascade)
+  // Users 테이블과 관계를 설정합니다.
+  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
-  @@map("Coments")
+  @@map("Comments")
 }
+  
+  model UserHistories {
+    userHistoryId String   @id @default(uuid()) @map("userHistoryId") // uuid() 여러가지 정보를 가지고 있는 식별자 -> 기본값으로 사용
+    userId        Int      @map("userId") // 사용자(Users) 테이블을 참조하는 외래키
+    changedField  String   @map("changedField") // 변경된 필드명
+    oldValue      String?  @map("oldValue") // 변경 전 값
+    newValue      String   @map("newValue") // 변경 후 값
+    changedAt     DateTime @default(now()) @map("changedAt") // createdAt과 동일한 역할
+  
+    // Users 테이블과 관계를 설정합니다.
+    user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  
+    @@map("UserHistories")
+  }
